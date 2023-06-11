@@ -38,6 +38,8 @@
   },
   "_moduleAliases": {
     "@/utils": "dist/utils",
-    "@/db": "dist/db"
+    "@/db": "dist/db",
+    "@/application": "dist/modules/application",
+    "@/roles": "dist/modules/roles"
   }
 }

@@ -1,21 +1,31 @@
+import { applicationRoutes } from '@/application/application.routes';
+import { applicationSchemas } from '@/application/application.schema';
 import Fastify from 'fastify';
 
 export const buildServer = async () => {
-    const app = Fastify({
-        logger: {
-            transport: {
-                target: 'pino-pretty',
-            },
-        },
-    });
+  const app = Fastify({
+    logger: {
+      transport: {
+        target: 'pino-pretty',
+      },
+    },
+  });
 
-    /**
-     * register plugins
-     */
+  /**
+   * register plugins
+   */
 
-    /**
-     * register routes
-     */
+  /**
+   * register schemas
+   */
+  applicationSchemas.forEach((schema) => {
+    app.addSchema(schema);
+  });
 
-    return app;
+  /**
+   * register routes
+   */
+  app.register(applicationRoutes, { prefix: '/api/application' });
+
+  return app;
 };
