@@ -1,0 +1,41 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1686483338723,
+      "tag": "0000_strong_garia",
+      "breakpoints": false
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1686485258231,
+      "tag": "0001_young_warpath",
+      "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1686485764420,
+      "tag": "0002_light_post",
+      "breakpoints": false
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1686486723491,
+      "tag": "0003_robust_raider",
+      "breakpoints": false
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1686487164763,
+      "tag": "0004_friendly_sage",
+      "breakpoints": false
+    }
+  ]
+}
