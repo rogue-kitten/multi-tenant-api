@@ -1,3 +1,4 @@
+import { PERMISSIONS } from '@/utils/permissions';
 import { FastifyInstance } from 'fastify';
 import {
   assignRoleToUserHandler,
@@ -37,6 +38,7 @@ export const userRoutes = async (app: FastifyInstance) => {
     schema: {
       body: $ref('assignRoleSchema'),
     },
+    preHandler: [app.auth, app.guard.scope(PERMISSIONS['users:role:write'])],
     handler: assignRoleToUserHandler,
   });
 };

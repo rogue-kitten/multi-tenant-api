@@ -6,6 +6,7 @@ import { userRoutes } from '@/users/users.route';
 import { userSchemas } from '@/users/users.schema';
 import jwt from '@fastify/jwt';
 import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
+import guard from 'fastify-guard';
 
 export const app = Fastify({
   logger: {
@@ -20,6 +21,15 @@ export const buildServer = async () => {
    * register plugins
    */
   app.register(jwt, { secret: 'sdklfvjnldkfjvndfklsvhbj' });
+  app.register(guard, {
+    requestProperty: 'user',
+    scopeProperty: 'permissions',
+    errorHandler(result, request, reply) {
+      return reply.code(401).send({
+        message: 'You do not have the permissions to perform that action',
+      });
+    },
+  });
 
   /**
    * add decorators
