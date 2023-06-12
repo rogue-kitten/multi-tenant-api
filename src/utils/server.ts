@@ -1,5 +1,7 @@
 import { applicationRoutes } from '@/application/application.routes';
 import { applicationSchemas } from '@/application/application.schema';
+import { roleSchema } from '@/roles/role.schema';
+import { roleRoutes } from '@/roles/roles.route';
 import { userRoutes } from '@/users/users.route';
 import { userSchemas } from '@/users/users.schema';
 import jwt from '@fastify/jwt';
@@ -37,7 +39,7 @@ export const buildServer = async () => {
   /**
    * register schemas
    */
-  [...applicationSchemas, ...userSchemas].forEach((schema) => {
+  [...applicationSchemas, ...userSchemas, ...roleSchema].forEach((schema) => {
     app.addSchema(schema);
   });
 
@@ -46,6 +48,7 @@ export const buildServer = async () => {
    */
   app.register(applicationRoutes, { prefix: '/api/application' });
   app.register(userRoutes, { prefix: '/api/users' });
+  app.register(roleRoutes, { prefix: '/api/roles' });
 
   return app;
 };
