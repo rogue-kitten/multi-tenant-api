@@ -1,10 +1,13 @@
 import { getRoleByName } from '@/roles/roles.services';
 import { SYSTEM_ROLES } from '@/utils/permissions';
+import { app } from '@/utils/server';
+import bcrypt from 'bcrypt';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { CreateUserInput } from './users.schema';
+import { CreateUserInput, LoginUserInput } from './users.schema';
 import {
   assignRoleToUser,
   createUser,
+  findUserByEmail,
   getUserByApplication,
 } from './users.service';
 
@@ -50,4 +53,45 @@ export const createUserHandler = async (
   } catch (error) {
     return reply.code(500).send(error);
   }
+};
+
+/**
+ * verifies if the email and password is correct
+ * Genertates an accessToken if it is correct
+ */
+
+export const loginHandler = async (
+  request: FastifyRequest<{ Body: LoginUserInput }>,
+  reply: FastifyReply
+) => {
+  const { password, email, applicationId } = request.body;
+
+  /**
+   * email check
+   */
+  const user = await findUserByEmail(email, applicationId);
+  if (!user)
+    return reply.code(400).send({ message: 'Invalid email or password' });
+
+  /**
+   * password check
+   */
+  const isValidPassword = await bcrypt
+    .compare(password, user.password)
+    .catch(() => false);
+
+  if (!isValidPassword)
+    return reply.code(400).send({ message: 'Invalid email or password' });
+
+  /**
+   * generate accessToken
+   */
+  const accessToken = app.jwt.sign({
+    applicationId,
+    email: user.email,
+    userId: user.id,
+    permissions: user.permissions,
+  });
+
+  return { accessToken };
 };

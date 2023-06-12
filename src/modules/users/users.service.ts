@@ -1,7 +1,7 @@
 import { db } from '@/db/index';
-import { user, usersToRoles } from '@/db/schema';
+import { roles, user, usersToRoles } from '@/db/schema';
 import bcrypt from 'bcrypt';
-import { InferModel, eq } from 'drizzle-orm';
+import { InferModel, and, eq } from 'drizzle-orm';
 
 /**
  * stores a new user in the database
@@ -48,4 +48,64 @@ export const assignRoleToUser = async (
   const result = await db.insert(usersToRoles).values(data).returning();
 
   return result[0];
+};
+
+/**
+ * gets the user based on the email and application
+ * then gets all the roles assigned to this user for this application
+ * creates a unique array for all the permissions which are assigned to this user
+ */
+export const findUserByEmail = async (email: string, applicationId: string) => {
+  const result = await db
+    .select({
+      email: user.email,
+      id: user.id,
+      password: user.password,
+      roleName: roles.name,
+      permissions: roles.permissions,
+    })
+    .from(user)
+    .where(and(eq(user.email, email), eq(user.applicationId, applicationId)))
+    .leftJoin(
+      usersToRoles,
+      and(
+        eq(usersToRoles.applicationId, applicationId),
+        eq(usersToRoles.userId, user.id)
+      )
+    )
+    .leftJoin(
+      roles,
+      and(
+        eq(roles.id, usersToRoles.roleId),
+        eq(roles.applicationId, applicationId)
+      )
+    );
+
+  if (!result.length) return null;
+
+  /**
+   * gets a unique list of permissions based on all the roles the user has for a given application,
+   * we do this because for an application, a user might have more than one role
+   */
+  const currentUser = result.reduce((acc, curr) => {
+    if (!acc.id) {
+      return {
+        ...curr,
+        permissions: new Set(curr.permissions),
+      };
+    }
+
+    if (!curr.permissions) return acc;
+
+    curr.permissions.forEach((permission) => {
+      acc.permissions.add(permission);
+    });
+
+    return acc;
+  }, {} as Omit<(typeof result)[number], 'permissions'> & { permissions: Set<string> });
+
+  return {
+    ...currentUser,
+    permissions: Array.from(currentUser.permissions),
+  };
 };
