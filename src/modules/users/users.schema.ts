@@ -23,8 +23,17 @@ const loginUserReplySchema = z.object({
 
 export type LoginUserInput = z.infer<typeof loginUserSchema>;
 
+const assignRoleSchema = z.object({
+  userId: z.string().uuid(),
+  roleId: z.string().uuid(),
+  applicationId: z.string().uuid(),
+});
+
+export type AssignRoleInput = z.infer<typeof assignRoleSchema>;
+
 export const { schemas: userSchemas, $ref } = buildJsonSchemas({
   createUserSchema,
   loginUserSchema,
   loginUserReplySchema,
+  assignRoleSchema,
 });

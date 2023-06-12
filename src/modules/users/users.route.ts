@@ -1,5 +1,9 @@
 import { FastifyInstance } from 'fastify';
-import { createUserHandler, loginHandler } from './users.controller';
+import {
+  assignRoleToUserHandler,
+  createUserHandler,
+  loginHandler,
+} from './users.controller';
 import { $ref } from './users.schema';
 
 export const userRoutes = async (app: FastifyInstance) => {
@@ -24,5 +28,15 @@ export const userRoutes = async (app: FastifyInstance) => {
       },
     },
     handler: loginHandler,
+  });
+
+  /**
+   * assigns the user a role
+   */
+  app.post('/roles', {
+    schema: {
+      body: $ref('assignRoleSchema'),
+    },
+    handler: assignRoleToUserHandler,
   });
 };

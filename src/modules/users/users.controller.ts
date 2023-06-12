@@ -3,7 +3,11 @@ import { SYSTEM_ROLES } from '@/utils/permissions';
 import { app } from '@/utils/server';
 import bcrypt from 'bcrypt';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { CreateUserInput, LoginUserInput } from './users.schema';
+import {
+  AssignRoleInput,
+  CreateUserInput,
+  LoginUserInput,
+} from './users.schema';
 import {
   assignRoleToUser,
   createUser,
@@ -94,4 +98,22 @@ export const loginHandler = async (
   });
 
   return { accessToken };
+};
+
+/**
+ * assigns a role to a user
+ */
+export const assignRoleToUserHandler = async (
+  request: FastifyRequest<{ Body: AssignRoleInput }>,
+  reply: FastifyReply
+) => {
+  const { applicationId, roleId, userId } = request.body;
+
+  try {
+    const result = await assignRoleToUser({ applicationId, roleId, userId });
+
+    return { result };
+  } catch (e) {
+    return reply.code(400).send({ message: 'Could not assign role to user' });
+  }
 };
